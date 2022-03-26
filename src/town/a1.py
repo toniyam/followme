@@ -63,7 +63,7 @@ class A1(IAct):
         Logger.debug('30 countdown')
         wait(33.5, 33.7)
         while True:
-            found = TemplateFinder().search("A1_BOSS", grab())
+            found = TemplateFinder().search("A1_CEO", grab())
             if found.valid:
                 Logger.debug(' center value')
                 Logger.debug(found.center)
