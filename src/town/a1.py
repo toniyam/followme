@@ -2,7 +2,7 @@ from char import IChar
 from item.item_finder import ItemFinder
 from logger import Logger
 from town.i_act import IAct
-from screen import grab
+from screen import convert_monitor_to_screen, convert_screen_to_abs, grab
 from config import Config
 from npc_manager import Npc, open_npc_menu, press_npc_btn
 from pather import Pather, Location
@@ -11,6 +11,7 @@ from template_finder import TemplateFinder
 from ui_manager import ScreenObjects, is_visible
 from utils.misc import wait
 from screen import convert_abs_to_monitor
+from utils.custom_mouse import mouse
 
 class A1(IAct):
     def __init__(self, pather: Pather, char: IChar):
@@ -59,19 +60,35 @@ class A1(IAct):
         return False
 
     def open_trade_menu(self, curr_loc: Location) -> Union[Location, bool]:
-        found = TemplateFinder().search("A1_AROCK", grab())
-        Logger.debug(' a rock?????')
-        Logger.debug(found.center)
-        Logger.debug(curr_loc)
-        Logger.debug(' a rock end....')
-        x_coor = found.center[0] - 640
-        y_coor = found.center[1] - 360
-        Logger.debug(x_coor)
-        x_m, y_m = convert_abs_to_monitor([x_coor, y_coor])
-        self._char.move((x_m, y_m), force_move=True)
-        wait(2.5, 2.7)
-        x_m, y_m = convert_abs_to_monitor([110, 122])
-        self._char.move((x_m, y_m), force_move=True)
+        Logger.debug('30 countdown')
+        wait(33.5, 33.7)
+        while True:
+            found = TemplateFinder().search("A1_BOSS", grab())
+            if found.valid:
+                Logger.debug(' center value')
+                Logger.debug(found.center)
+                # x_coor = found.center[0] - 640
+                # y_coor = found.center[1] - 360
+                # Logger.debug(x_coor)
+                # Logger.debug(y_coor)
+                #  x_m, y_m = convert_abs_to_monitor([x_coor, y_coor])
+                x_m, y_m = convert_abs_to_monitor(found.center)
+                Logger.debug('moving mon value')
+                Logger.debug(x_m)
+                Logger.debug(y_m)
+                # self._char.move((x_m - 1000, y_m - 1000), force_move=True)
+                # self._char.move((found.center[0], found.center[1]), force_move=True)
+                factor = Config().advanced_options["pathing_delay_factor"]
+                pos_screen = convert_monitor_to_screen(found.center)
+                pos_abs = convert_screen_to_abs(pos_screen)
+                x_m, y_m = convert_abs_to_monitor(pos_abs)
+                mouse.move(x_m, y_m + 40, randomize=5, delay_factor=[factor*0.1, factor*0.14])
+                mouse.click(button="left")
+                wait(0.5, 1.2)
+            else:
+                wait(1.5, 1.7)
+        # x_m, y_m = convert_abs_to_monitor([110, 122])
+        # self._char.move((x_m, y_m), force_move=True)
         # if not self._pather.traverse_nodes([228], self._char, force_move=True): return False
         # open_npc_menu(Npc.AKARA)
         # press_npc_btn(Npc.AKARA, "trade")
