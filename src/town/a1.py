@@ -1,4 +1,6 @@
 from char import IChar
+from item.item_finder import ItemFinder
+from logger import Logger
 from town.i_act import IAct
 from screen import grab
 from config import Config
@@ -8,7 +10,7 @@ from typing import Union
 from template_finder import TemplateFinder
 from ui_manager import ScreenObjects, is_visible
 from utils.misc import wait
-
+from screen import convert_abs_to_monitor
 
 class A1(IAct):
     def __init__(self, pather: Pather, char: IChar):
@@ -57,9 +59,22 @@ class A1(IAct):
         return False
 
     def open_trade_menu(self, curr_loc: Location) -> Union[Location, bool]:
-        if not self._pather.traverse_nodes((curr_loc, Location.A1_AKARA), self._char, force_move=True): return False
-        open_npc_menu(Npc.AKARA)
-        press_npc_btn(Npc.AKARA, "trade")
+        found = TemplateFinder().search("A1_AROCK", grab())
+        Logger.debug(' a rock?????')
+        Logger.debug(found.center)
+        Logger.debug(curr_loc)
+        Logger.debug(' a rock end....')
+        x_coor = found.center[0] - 640
+        y_coor = found.center[1] - 360
+        Logger.debug(x_coor)
+        x_m, y_m = convert_abs_to_monitor([x_coor, y_coor])
+        self._char.move((x_m, y_m), force_move=True)
+        wait(2.5, 2.7)
+        x_m, y_m = convert_abs_to_monitor([110, 122])
+        self._char.move((x_m, y_m), force_move=True)
+        # if not self._pather.traverse_nodes([228], self._char, force_move=True): return False
+        # open_npc_menu(Npc.AKARA)
+        # press_npc_btn(Npc.AKARA, "trade")
         return Location.A1_AKARA
 
     def open_stash(self, curr_loc: Location) -> Union[Location, bool]:
